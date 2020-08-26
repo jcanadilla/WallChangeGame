@@ -11,7 +11,7 @@ public class SectionJSONManager
 
     public void GuardarSection(string path, Section section)
     {
-        string sectionJSON = JsonUtility.ToJson(section);
+        string sectionJSON = JsonUtility.ToJson(section, true);
         System.IO.File.WriteAllText(path, sectionJSON);
     }
 
