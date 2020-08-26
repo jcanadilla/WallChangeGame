@@ -7,28 +7,16 @@ using UnityEngine.SceneManagement;
 
 public class SectionCreator : EditorWindow
 {
+    // Seccion
+    public static Section section;
 
-    public static List<GameObject> objetos;
-    public static string prefabName;
-
-    public static int numFilas = 20;
-
-    public static int[] columna1;
-    public static int[] columna2;
-    public static int[] columna3;
-    public static int[] columna4;
-    public static int[] columna5;
+    // JSONManager para gestionar el JSON de la sección
+    public static SectionJSONManager sectionJSONManager;
 
     public static bool initialized = false;
 
     private static string prefabScenePath = "Assets/Editor/PrefabScene.unity";
     private static string prefabSavedPath = "Assets/Prefabs/Secciones";
-
-    private static Vector3 columna1Position = new Vector3(-2, 0, 0);
-    private static Vector3 columna2Position = new Vector3(-1, 0, 0);
-    private static Vector3 columna3Position = new Vector3(0, 0, 0);
-    private static Vector3 columna4Position = new Vector3(1, 0, 0);
-    private static Vector3 columna5Position = new Vector3(2, 0, 0);
 
     [MenuItem("Component/Section creator")]
     public static void Init()
@@ -43,13 +31,8 @@ public class SectionCreator : EditorWindow
 
     public static void Initialize()
     {
-        prefabName = "";
-        objetos = new List<GameObject>();
-        columna1 = new int[numFilas];
-        columna2 = new int[numFilas];
-        columna3 = new int[numFilas];
-        columna4 = new int[numFilas];
-        columna5 = new int[numFilas];
+        section = new Section();
+        sectionJSONManager = new SectionJSONManager();
         initialized = true;
     }
 
@@ -65,14 +48,27 @@ public class SectionCreator : EditorWindow
         /**
          * Creamos la seccion para definir los diferentes objetos 
          */
-        int newCount = Mathf.Max(2, EditorGUILayout.IntField("Objetos", objetos.Count));
-        while (newCount < objetos.Count)
-            objetos.RemoveAt(objetos.Count - 1);
-        while (newCount > objetos.Count)
-            objetos.Add(null);
-        for (int i = 0; i < objetos.Count; i++)
+        int newCount = Mathf.Max(2, EditorGUILayout.IntField("Objetos", section.objetos.Count));
+        
+        // Botones añadir/quitar
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Añadir"))
         {
-            objetos[i] = (GameObject)EditorGUILayout.ObjectField(objetos[i], typeof(GameObject), true);
+            newCount += 1;
+        }
+        if (GUILayout.Button("Quitar"))
+        {
+            newCount -= 1;
+        }
+        EditorGUILayout.EndHorizontal();
+         
+        while (newCount < section.objetos.Count)
+            section.objetos.RemoveAt(section.objetos.Count - 1);
+        while (newCount > section.objetos.Count)
+            section.objetos.Add(null);
+        for (int i = 0; i < section.objetos.Count; i++)
+        {
+            section.objetos[i] = (GameObject)EditorGUILayout.ObjectField(section.objetos[i], typeof(GameObject), true);
         }
 
         /**
@@ -80,22 +76,22 @@ public class SectionCreator : EditorWindow
          */
         GUILayout.Label("\n\nConfiguración de la sección");
 
-        for (int i = numFilas - 1; i >= 0; i--)
+        for (int i = section.numFilas - 1; i >= 0; i--)
         {
             Rect r = EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Bloque " + (i + 1));
-            columna1[i] = EditorGUILayout.IntField(columna1[i] != 0 ? columna1[i] : 0);
-            columna2[i] = EditorGUILayout.IntField(columna2[i] != 0 ? columna2[i] : 0);
-            columna3[i] = EditorGUILayout.IntField(columna3[i] != 0 ? columna3[i] : 0);
-            columna4[i] = EditorGUILayout.IntField(columna4[i] != 0 ? columna4[i] : 0);
-            columna5[i] = EditorGUILayout.IntField(columna5[i] != 0 ? columna5[i] : 0);
+            section.columna1[i] = EditorGUILayout.IntField(section.columna1[i] != 0 ? section.columna1[i] : 0);
+            section.columna2[i] = EditorGUILayout.IntField(section.columna2[i] != 0 ? section.columna2[i] : 0);
+            section.columna3[i] = EditorGUILayout.IntField(section.columna3[i] != 0 ? section.columna3[i] : 0);
+            section.columna4[i] = EditorGUILayout.IntField(section.columna4[i] != 0 ? section.columna4[i] : 0);
+            section.columna5[i] = EditorGUILayout.IntField(section.columna5[i] != 0 ? section.columna5[i] : 0);
             EditorGUILayout.EndHorizontal();
         }
 
         GUILayout.Label("\nOpciones del prefab");
         EditorGUILayout.BeginHorizontal();
         GUILayout.Label("Nombre de la sección:");
-        prefabName = EditorGUILayout.TextField(prefabName);
+        section.prefabName = EditorGUILayout.TextField(section.prefabName);
         EditorGUILayout.EndHorizontal();
 
 
@@ -105,7 +101,14 @@ public class SectionCreator : EditorWindow
         {
             CrearPrefabButton();
         }
-        GUILayout.Button("Cargar prefab");
+        if(GUILayout.Button("Cargar prefab"))
+        {
+            CargarPrefabButton();
+        }
+        if (GUILayout.Button("Reset"))
+        {
+            ResetButton();
+        }
         EditorGUILayout.EndHorizontal();
     }
 
@@ -121,6 +124,20 @@ public class SectionCreator : EditorWindow
         {
             Debug.Log("PREFAB NO GENERADO! HAY QUE GUARDAR LA SCENA PRIMERO");
         }
+    }
+
+    public static void CargarPrefabButton()
+    {
+        string path = EditorUtility.OpenFilePanel("", prefabSavedPath, "json");
+        if (path.Length != 0)
+        {
+            section = sectionJSONManager.CargarSection(path);
+        }
+    }
+
+    public static void ResetButton()
+    {
+        Initialize();
     }
 
     public static bool GuardarScene()
@@ -154,23 +171,24 @@ public class SectionCreator : EditorWindow
         GameObject root = new GameObject("root");
         root.name = "root";
 
-        for (int i = 0; i < numFilas; i++)
+        for (int i = 0; i < section.numFilas; i++)
         {
-            InstanciarObjetosColumna(i, columna1, objetos, columna1Position, root);
-            InstanciarObjetosColumna(i, columna2, objetos, columna2Position, root);
-            InstanciarObjetosColumna(i, columna3, objetos, columna3Position, root);
-            InstanciarObjetosColumna(i, columna4, objetos, columna4Position, root);
-            InstanciarObjetosColumna(i, columna5, objetos, columna5Position, root);
+            InstanciarObjetosColumna(i, section.columna1, section.objetos, section.columna1Position, root);
+            InstanciarObjetosColumna(i, section.columna2, section.objetos, section.columna2Position, root);
+            InstanciarObjetosColumna(i, section.columna3, section.objetos, section.columna3Position, root);
+            InstanciarObjetosColumna(i, section.columna4, section.objetos, section.columna4Position, root);
+            InstanciarObjetosColumna(i, section.columna5, section.objetos, section.columna5Position, root);
         }
 
 //         Instantiate(objetos[1], root.transform);
 
         // Guardamos el prefab
         bool saved = false;
-        PrefabUtility.SaveAsPrefabAsset(root, prefabSavedPath + "/" + prefabName + ".prefab", out saved);
+        PrefabUtility.SaveAsPrefabAsset(root, prefabSavedPath + "/" + section.prefabName + ".prefab", out saved);
         if(saved)
         {
-            Debug.Log("PREFAB " + prefabName + " GUARDADO CORRECTAMENTE");
+            sectionJSONManager.GuardarSection(prefabSavedPath + "/" + section.prefabName + ".json", section);
+            Debug.Log("PREFAB " + section.prefabName + " GUARDADO CORRECTAMENTE");
             DestroyImmediate(root);
             EditorSceneManager.OpenScene(scenePath);
         }
