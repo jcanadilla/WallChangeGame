@@ -5,8 +5,10 @@ using UnityEngine;
 public class GameController : MonoBehaviour
 {
 
+    // Puntos
     [SerializeField] private PointsWindow pointsWindow;
     private int points = 1;
+
 
     // Update is called once per frame
     void Update()

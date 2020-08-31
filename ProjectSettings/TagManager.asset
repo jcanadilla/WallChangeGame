@@ -8,6 +8,8 @@ TagManager:
   - LeftWall
   - RightWall
   - Wall
+  - Section
+  - SectionDestroyer
   layers:
   - Default
   - TransparentFX

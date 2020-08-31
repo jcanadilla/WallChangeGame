@@ -168,8 +168,17 @@ public class SectionCreator : EditorWindow
         EditorSceneManager.OpenScene(prefabScenePath);
 
         // Creamos el objeto raiz del prefab
-        GameObject root = new GameObject("root");
+        GameObject root = new GameObject();
         root.name = "root";
+
+        // Buscamos el objeto Section
+        GameObject sectionCollider = GameObject.Find("Section");
+        sectionCollider.transform.SetParent(root.transform);
+
+        // Buscamos el objeto spawner.
+        // Este objeto es el que controla cuando generar una nueva sección
+        GameObject spawner = GameObject.Find("Spawner");
+        spawner.transform.SetParent(root.transform);
 
         for (int i = 0; i < section.numFilas; i++)
         {
