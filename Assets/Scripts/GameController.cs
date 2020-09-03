@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
+    // Estado de la partida
+    public delegate void OnGameOver();
+    public static event OnGameOver onGameOver;
 
     // Puntos
     [SerializeField] private PointsWindow pointsWindow;
@@ -19,7 +22,7 @@ public class GameController : MonoBehaviour
 
     private void IncreasePoints()
     {
-        points += 1 + (int)(0.5f * Time.time);
+        points += 1 + (int)(0.2f * Time.time);
     }
 
 }
