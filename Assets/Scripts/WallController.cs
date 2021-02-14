@@ -26,19 +26,7 @@ public class WallController : MonoBehaviour
 
     void Awake()
     {
-        // Inicializamos la lista de bloques de la pared
-        wallsPool = new List<GameObject>();
-
-        // Generamos las paredes de la derecha
-        for (int i = 0; i < numberOfWalls; i += 1)
-        {
-            GameObject obj = (GameObject)Instantiate(wallPrefab, this.transform);
-            obj.SetActive(true);
-            obj.name = "Wall " + i;
-            obj.transform.Translate(0, obj.transform.position.y + (i * obj.transform.localScale.y), 0);
-            wallsPool.Add(obj);
-        }
-        lastWallPositioned = this.wallsPool[wallsPool.Count - 1];
+        Initialize();
     }
 
     // Update is called once per frame
@@ -64,6 +52,38 @@ public class WallController : MonoBehaviour
             }
         }
         return null;
+    }
+
+    private void Initialize()
+    {
+        // Inicializamos la lista de bloques de la pared
+        wallsPool = new List<GameObject>();
+
+        // Generamos las paredes
+        for (int i = 0; i < numberOfWalls; i += 1)
+        {
+            GameObject obj = (GameObject)Instantiate(wallPrefab, this.transform);
+            obj.SetActive(true);
+            obj.name = "Wall " + i;
+            obj.transform.Translate(0, obj.transform.position.y + (i * obj.transform.localScale.y), 0);
+            wallsPool.Add(obj);
+        }
+        lastWallPositioned = this.wallsPool[wallsPool.Count - 1];
+    }
+
+    private void DestroyAll()
+    {
+        for (int i = 0; i < numberOfWalls; i += 1)
+        {
+            DestroyImmediate(wallsPool[i]);
+        }
+        lastWallPositioned = null;
+    }
+
+    public void Restart()
+    {
+        DestroyAll();
+        Initialize();
     }
 
 }

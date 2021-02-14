@@ -10,8 +10,16 @@ public class SectionController : MonoBehaviour
     public List<GameObject> normalSections;
     public List<GameObject> hardSections;
 
-    
-    public List<GameObject> InitializeSectionsPool(List<GameObject> sections)
+    private GameObject spawner;
+    private Vector3 initialPosition;
+
+    private void Start()
+    {
+        spawner = transform.Find("Spawner").gameObject;
+        initialPosition = spawner.transform.position;
+    }
+
+/*    public List<GameObject> InitializeSectionsPool(List<GameObject> sections)
     {
         List<GameObject> sectionPool = new List<GameObject>();
         for (int i = 0; i < sections.Count; i++)
@@ -24,7 +32,7 @@ public class SectionController : MonoBehaviour
             sectionPool.Add(section);
         }
         return sectionPool;
-    }
+    }*/
 
     public void SpawnNewSection (GameObject player)
     {
@@ -60,4 +68,18 @@ public class SectionController : MonoBehaviour
 
     }
 
+    public void Restart()
+    {
+        spawner.transform.position = initialPosition;
+        DestroyAllSections();
+    }
+
+    public void DestroyAllSections()
+    {
+        GameObject[] sections = GameObject.FindGameObjectsWithTag("SectionRoot");
+        foreach (GameObject section in sections)
+        {
+            GameObject.Destroy(section);
+        }
+    }
 }

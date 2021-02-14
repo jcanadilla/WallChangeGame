@@ -11,6 +11,7 @@ TagManager:
   - Section
   - SectionDestroyer
   - Enemy
+  - SectionRoot
   layers:
   - Default
   - TransparentFX

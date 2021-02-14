@@ -6,7 +6,7 @@ public class SectionDestroyer: MonoBehaviour
 {
     public void OnTriggerExit(Collider other)
     {
-        if(other.gameObject.tag == "Section")
+        if(other.gameObject.CompareTag("Section"))
         {
             Destroy(other.gameObject.transform.parent.gameObject);
         }

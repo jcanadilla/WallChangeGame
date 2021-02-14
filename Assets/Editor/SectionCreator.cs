@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 public class SectionCreator : EditorWindow
 {
     // Seccion
-    public static Section section;
+    public static Section section; 
 
     // JSONManager para gestionar el JSON de la sección
     public static SectionJSONManager sectionJSONManager;
@@ -170,6 +170,7 @@ public class SectionCreator : EditorWindow
         // Creamos el objeto raiz del prefab
         GameObject root = new GameObject();
         root.name = "root";
+        root.tag = "SectionRoot";
 
         // Buscamos el objeto Section
         GameObject sectionCollider = GameObject.Find("Section");

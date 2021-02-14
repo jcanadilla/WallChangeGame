@@ -12,4 +12,9 @@ public class PointsWindow : MonoBehaviour
         pointsText.text = "Points:\n" + amount;
     }
 
+    public void SetActive(bool active)
+    {
+        this.gameObject.SetActive(active);
+    }
+
 }
